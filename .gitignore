@@ -1,0 +1,23 @@
+# This file is very important! 
+# It prevents sensitive information from being committed to the repository.
+
+# dependencies
+node_modules/
+
+# environment variables
+.env
+.env.local
+.env.*.local
+
+# Next.js build output
+.next/
+out/
+
+# Prisma generated client
+generated/
+
+# misc
+.DS_Store
+
+# Claude Config
+.claude
