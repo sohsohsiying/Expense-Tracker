@@ -7,11 +7,15 @@
 import ExpenseCard from "@/components/ExpenseCard";
 
 // Hardcoded for now — we wire this up to a real database in Part 3.
-const expenses = [
-  { id: 1, title: "Lunch with team", amount: 47.5, date: "2026-05-08" },
-  { id: 2, title: "AWS hosting", amount: 120.0, date: "2026-05-01" },
-  { id: 3, title: "Office supplies", amount: 23.99, date: "2026-04-28" },
-];
+// We will now replace this with a call to prisma
+// const expenses = [
+//   { id: 1, title: "Lunch with team", amount: 47.5, date: "2026-05-08" },
+//   { id: 2, title: "AWS hosting", amount: 120.0, date: "2026-05-01" },
+//   { id: 3, title: "Office supplies", amount: 23.99, date: "2026-04-28" },
+// ]; 
+
+// After replacing with prisma - TODO
+
 
 export default function ExpensesPage() {
   return (
