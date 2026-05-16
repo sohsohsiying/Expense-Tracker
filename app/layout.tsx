@@ -1,3 +1,5 @@
+import './globals.css'
+
 // layout.tsx — the ROOT LAYOUT for your entire app.
 //
 // Every page in Next.js is wrapped by this component automatically.
