@@ -24,9 +24,45 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
   const { title, amount, date } = await req.json();
+
+  // SERVER-SIDE VALIDATION
+  // Check if title is provided and not empty/whitespace
+  if (!title || typeof title !== 'string' || title.trim().length === 0) {
+    return NextResponse.json(
+      { error: 'Title is required and cannot be empty' },
+      { status: 400 }
+    );
+  }
+
+  // Check if title is reasonable length (max 100 chars)
+  if (title.length > 100) {
+    return NextResponse.json(
+      { error: 'Title must be 100 characters or less' },
+      { status: 400 }
+    );
+  }
+
+  // Check if amount is a valid number and positive
+  const parsedAmount = parseFloat(amount);
+  if (isNaN(parsedAmount) || parsedAmount <= 0) {
+    return NextResponse.json(
+      { error: 'Amount must be a positive number' },
+      { status: 400 }
+    );
+  }
+
+  // Check if date is valid
+  const parsedDate = new Date(date);
+  if (isNaN(parsedDate.getTime())) {
+    return NextResponse.json(
+      { error: 'Date must be a valid date' },
+      { status: 400 }
+    );
+  }
+
   const expense = await db.expense.update({
     where: { id },
-    data: { title, amount: parseFloat(amount), date: new Date(date) },
+    data: { title: title.trim(), amount: parsedAmount, date: parsedDate },
   });
   return NextResponse.json(expense);
 }
