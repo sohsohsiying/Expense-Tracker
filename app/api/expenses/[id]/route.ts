@@ -1,8 +1,6 @@
 // Handles PATCH (update an expense) and DELETE (delete an expense)
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 /* How are requests recieved and arguments passed into the API route handler
  --> req: NextRequest, { params }: { params: { id: string } }
@@ -16,7 +14,7 @@ const prisma = new PrismaClient();
 // It returns the record if found, or null if no matching record exists.
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
-  const expense = await prisma.expense.findUnique({ where: { id } });
+  const expense = await db.expense.findUnique({ where: { id } });
   if (!expense) return NextResponse.json({ error: 'Expense not found' }, { status: 404 });
   return NextResponse.json(expense);
 }
@@ -26,7 +24,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
   const { title, amount, date } = await req.json();
-  const expense = await prisma.expense.update({
+  const expense = await db.expense.update({
     where: { id },
     data: { title, amount: parseFloat(amount), date: new Date(date) },
   });
@@ -37,6 +35,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 // delete: Prisma Client method used to delete a single record from the database. It requires a unique identifier (e.g., id) to find the record to delete.
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
-  await prisma.expense.delete({ where: { id } });
+  await db.expense.delete({ where: { id } });
   return NextResponse.json({ message: 'Expense deleted' });
 }
