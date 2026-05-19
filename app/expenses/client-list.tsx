@@ -16,6 +16,7 @@ type Expense = {
 export default function ExpensesClientList() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // Fetch expenses from API
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function ExpensesClientList() {
     setExpenses(expenses.filter((e) => e.id !== id));
   }
 
-  // Edit expense handler (for demo, not implemented in UI yet)
+  // Edit expense handler
   async function handleEditExpense(id: string, updated: { title: string; amount: number; date: string }) {
     const res = await fetch(`/api/expenses/${id}`, {
       method: "PATCH",
@@ -53,25 +54,56 @@ export default function ExpensesClientList() {
     });
     const updatedExpense = await res.json();
     setExpenses(expenses.map((e) => (e.id === id ? updatedExpense : e)));
+    setEditingId(null);
   }
 
   if (loading) return <p>Loading...</p>;
 
   return (
     <div>
-      <ExpenseForm onSubmit={handleAddExpense} initialData={{}} />
+      {editingId === null && <ExpenseForm onSubmit={handleAddExpense} initialData={{}} submitLabel="Add Expense" />}
       {expenses.length === 0 ? (
         <p>No expenses found.</p>
       ) : (
         expenses.map((expense) => (
           <div key={expense.id} className="mb-4">
-            <ExpenseCard title={expense.title} amount={expense.amount} date={expense.date} />
-            <button
-              onClick={() => handleDeleteExpense(expense.id)}
-              className="text-red-600 text-sm mt-1"
-            >
-              Delete
-            </button>
+            {editingId === expense.id ? (
+              <div className="border-l-4 border-blue-600 bg-blue-50 p-4 rounded mb-2">
+                <ExpenseForm
+                  initialData={{
+                    title: expense.title,
+                    amount: expense.amount,
+                    date: expense.date.slice(0, 10),
+                  }}
+                  onSubmit={(updated) => handleEditExpense(expense.id, updated)}
+                  submitLabel="Update Expense"
+                />
+                <button
+                  onClick={() => setEditingId(null)}
+                  className="text-gray-600 text-sm mt-2"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <>
+                <ExpenseCard title={expense.title} amount={expense.amount} date={expense.date} />
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setEditingId(expense.id)}
+                    className="text-blue-600 text-sm mt-1"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteExpense(expense.id)}
+                    className="text-red-600 text-sm mt-1"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         ))
       )}
