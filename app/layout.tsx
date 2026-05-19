@@ -1,4 +1,5 @@
 import './globals.css'
+import Navbar from '@/components/Navbar'
 
 // layout.tsx — the ROOT LAYOUT for your entire app.
 //
@@ -26,7 +27,10 @@ export default function RootLayout({
     <html lang="en">
       {/* <body> is where your visible page content lives.
           {children} renders whichever page the user navigated to. */}
-      <body>{children}</body>
+      <body>
+        <Navbar />
+        {children}
+      </body>
     </html>
   )
 }
