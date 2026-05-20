@@ -20,6 +20,10 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 function createPrismaClient() {
   // PrismaPg connects to a PostgreSQL database.
   // DATABASE_URL is read from your .env file — keep it secret, never commit it!
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is required to connect to the database.");
+  }
+
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
   return new PrismaClient({ adapter });
 }
