@@ -18,7 +18,7 @@ type ExpenseFormProps = {
 export default function ExpenseForm({ onSubmit, initialData = {}, submitLabel = "Add Expense" }: ExpenseFormProps) {
   // Sets up state variables for each form field, initialized from initialData if provided
   const [title, setTitle] = useState(initialData?.title || "");
-  const [amount, setAmount] = useState(initialData?.amount || "");
+  const [amount, setAmount] = useState<string>(initialData?.amount?.toString() || "");
   const [date, setDate] = useState(initialData?.date ? initialData.date.slice(0, 10) : ""); // YYYY-MM-DD format for date input
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
