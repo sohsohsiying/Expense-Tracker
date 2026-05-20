@@ -15,7 +15,9 @@ import { PrismaPg } from "@prisma/adapter-pg";
 // Without this trick, each reload would create a NEW database connection,
 // eventually exhausting the connection pool. Storing the client on `globalThis`
 // makes it persist across hot-reloads so we always reuse the same connection.
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+
+let prisma = globalForPrisma.prisma;
 
 function createPrismaClient() {
   // PrismaPg connects to a PostgreSQL database.
@@ -28,10 +30,25 @@ function createPrismaClient() {
   return new PrismaClient({ adapter });
 }
 
-// Reuse the existing client if one already exists (dev hot-reload safety),
-// otherwise create a fresh one.
-export const db = globalForPrisma.prisma ?? createPrismaClient();
+function getPrismaClient() {
+  if (!prisma) {
+    prisma = createPrismaClient();
 
-// Only cache the client globally outside of production.
-// In production each server process is long-lived, so no caching is needed.
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+    if (process.env.NODE_ENV !== "production") {
+      globalForPrisma.prisma = prisma;
+    }
+  }
+
+  return prisma;
+}
+
+// Lazily create the client only when a route actually queries the database.
+// This keeps `next build` from needing DATABASE_URL while importing API files.
+export const db = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    const client = getPrismaClient();
+    const value = client[prop as keyof PrismaClient];
+
+    return typeof value === "function" ? value.bind(client) : value;
+  },
+});
