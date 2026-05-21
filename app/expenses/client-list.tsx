@@ -21,25 +21,12 @@ export default function ExpensesClientList() {
 
   // Fetch expenses from API
   useEffect(() => {
-    async function loadExpenses() {
-      try {
-        setError(null);
-        const res = await fetch("/api/expenses");
-        const data = await res.json().catch(() => null);
-
-        if (!res.ok) {
-          throw new Error(data?.error || "Failed to load expenses");
-        }
-
+    fetch("/api/expenses")
+      .then((res) => res.json())
+      .then((data) => {
         setExpenses(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load expenses");
-      } finally {
         setLoading(false);
-      }
-    }
-
-    loadExpenses();
+      });
   }, []);
 
   // Add expense handler
@@ -70,14 +57,7 @@ export default function ExpensesClientList() {
   async function handleDeleteExpense(id: string) {
     try {
       setError(null);
-      const res = await fetch(`/api/expenses/${id}`, { method: "DELETE" });
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        setError(data?.error || "Failed to delete expense");
-        return;
-      }
-
+      await fetch(`/api/expenses/${id}`, { method: "DELETE" });
       setExpenses(expenses.filter((e) => e.id !== id));
     } catch (err) {
       setError("An error occurred while deleting the expense");
