@@ -21,12 +21,14 @@ let prisma = globalForPrisma.prisma;
 
 function createPrismaClient() {
   // PrismaPg connects to a PostgreSQL database.
-  // DATABASE_URL is read from your .env file — keep it secret, never commit it!
-  if (!process.env.DATABASE_URL) {
+  // DATABASE_URL is read from your environment — keep it secret, never commit it!
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (!databaseUrl) {
     throw new Error("DATABASE_URL is required to connect to the database.");
   }
 
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+  const adapter = new PrismaPg({ connectionString: databaseUrl });
   return new PrismaClient({ adapter });
 }
 
